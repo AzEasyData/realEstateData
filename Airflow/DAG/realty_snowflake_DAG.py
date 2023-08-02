@@ -92,42 +92,42 @@ def insert_data(cur, records):
 ## Function for DAG
 def extract_load():
     with snowflake.connector.connect(database='HOUSING_MARKET_STAGING', schema='PUBLIC', **db_credentials) as con:
-    cur = con.cursor()
-    existing_ids = set()
-    request_count = 0  # Initialize API call counter
-    while request_count < 100:  # Limit the number of API calls
-        data = get_data(api_endpoint, headers, querystring)
-        request_count += 1  # Increment the counter with each API call
+        cur = con.cursor()
+        existing_ids = set()
+        request_count = 0  # Initialize API call counter
+        while request_count < 100:  # Limit the number of API calls
+            data = get_data(api_endpoint, headers, querystring)
+            request_count += 1  # Increment the counter with each API call
 
-        if data:  # If the data was successfully fetched from the API
-            querystring['offset'] += 500
+            if data:  # If the data was successfully fetched from the API
+                querystring['offset'] += 500
 
-        if not data:  # if there is an error making the API call
-            logging.error(f"No data returned on request {request_count}.")
-            break
+            if not data:  # if there is an error making the API call
+                logging.error(f"No data returned on request {request_count}.")
+                break
 
-        # Process data only if it is unique
-        unique_records = [record for record in data if record['id'] not in existing_ids]
-        existing_ids.update(record['id'] for record in unique_records)
+            # Process data only if it is unique
+            unique_records = [record for record in data if record['id'] not in existing_ids]
+            existing_ids.update(record['id'] for record in unique_records)
 
-        logging.info(f"Retrieved {len(data)} records, {len(unique_records)} are unique.")
+            logging.info(f"Retrieved {len(data)} records, {len(unique_records)} are unique.")
 
-        if unique_records:
-            try:
-                insert_data(cur, unique_records)
-                con.commit()  # Commit the transaction
-                logging.info(
-                    f"Inserted {len(unique_records)} unique records into the database on request {request_count}.")
-            except snowflake.connector.errors.ProgrammingError as e:
-                logging.error(f"Failed to insert records due to a database error on request {request_count}: {e}")
-                break  # Exit the loop if insertion fails
-            except Exception as e:
-                logging.error(f"Failed to insert records due to an unexpected error on request {request_count}: {e}")
-                break  # Exit the loop if any other insertion error occurs
+            if unique_records:
+                try:
+                    insert_data(cur, unique_records)
+                    con.commit()  # Commit the transaction
+                    logging.info(
+                        f"Inserted {len(unique_records)} unique records into the database on request {request_count}.")
+                except snowflake.connector.errors.ProgrammingError as e:
+                    logging.error(f"Failed to insert records due to a database error on request {request_count}: {e}")
+                    break  # Exit the loop if insertion fails
+                except Exception as e:
+                    logging.error(f"Failed to insert records due to an unexpected error on request {request_count}: {e}")
+                    break  # Exit the loop if any other insertion error occurs
 
-        if len(data) < 500:  # if less than 500 records are returned, we've likely reached the end of the data
-            logging.info(f"Less than 500 records returned on request {request_count}.")
-            break
+            if len(data) < 500:  # if less than 500 records are returned, we've likely reached the end of the data
+                logging.info(f"Less than 500 records returned on request {request_count}.")
+                break
 
 ## Airflow Specific Code
 default_args = {
