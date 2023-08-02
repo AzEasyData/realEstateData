@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.operators.pythonc_operator import PythonOperator
+from airflow.operators.python_operator import PythonOperator
 from airflow.operators.snowflake_operator import SnowflakeOperator
 from datetime import datetime, timedelta
 import snowflake.connector
@@ -199,11 +199,11 @@ WHEN NOT MATCHED THEN
 
 """
 
-extract_load_task = PythonOperator(task_id='extract_and_load',
+extract_load_task = Python(task_id='extract_and_load',
 					                         python_callable=extract_load,
 					                         dag=dag)
 
-transform_task = SnowflakeOperator(task_id='transform',
+transform_task = Snowflake(task_id='transform',
                                    sql=transform_sql,
                                    snowflake_conn_id='realty_snowflake_production',
                                    dag=dag)
@@ -212,7 +212,7 @@ delete_staging_sql = """
 DELETE FROM HOUSING_MARKET_STAGING.PUBLIC.PROPERTY_SALE_LISTINGS;
 """
 
-delete_staging_task = SnowflakeOperator(task_id='delete_staging',
+delete_staging_task = Snowflake(task_id='delete_staging',
                                         sql=delete_staging_sql,
                                         snowflake_conn_id='realty_snowflake_staging',
                                         dag=dag)
