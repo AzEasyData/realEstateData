@@ -199,9 +199,9 @@ WHEN NOT MATCHED THEN
 
 """
 
-extract_load_task = Python(task_id='extract_and_load',
-					                         python_callable=extract_load,
-					                         dag=dag)
+extract_load_task = PythonOperator(task_id='extract_and_load',
+				   python_callable=extract_load,
+			           dag=dag)
 
 transform_task = Snowflake(task_id='transform',
                                    sql=transform_sql,
