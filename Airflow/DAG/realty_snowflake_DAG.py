@@ -205,7 +205,7 @@ extract_load_task = PythonOperator(task_id='extract_and_load',
 
 transform_task = SnowflakeOperator(task_id='transform',
                                    sql=transform_sql,
-                                   snowflake_conn_id='realty_snowflake_production',
+                                   snowflake_conn_id='snowflake_realty_production',
                                    dag=dag)
 
 delete_staging_sql = """
@@ -214,7 +214,7 @@ DELETE FROM HOUSING_MARKET_STAGING.PUBLIC.PROPERTY_SALE_LISTINGS;
 
 delete_staging_task = SnowflakeOperator(task_id='delete_staging',
                                         sql=delete_staging_sql,
-                                        snowflake_conn_id='realty_snowflake_staging',
+                                        snowflake_conn_id='snowflake_realty_staging',
                                         dag=dag)
 
 extract_load_task >> transform_task >> delete_staging_task
