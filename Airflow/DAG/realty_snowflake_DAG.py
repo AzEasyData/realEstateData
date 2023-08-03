@@ -132,15 +132,15 @@ def extract_load():
 ## Airflow Specific Code
 default_args = {
     'owner': 'airflow',
-    'start_date': datetime(2022, 1, 1),
+    'start_date': datetime(2023, 8, 3),
     'retries': 1,
     'retry_delay': timedelta(minutes=5)
 }
 
-dag = DAG('realty_mole_etl',
+dag = DAG('realty_mole_elt',
           default_args=default_args,
-          description='ETL pipeline for Realty Mole Property API',
-          schedule_interval='@weekly',
+          description='ELT pipeline for Realty Mole Property API',
+          schedule_interval='0 17 * * 4',  # Run at 5pm on Thursdays,
           catchup=False)
 
 transform_sql = """
