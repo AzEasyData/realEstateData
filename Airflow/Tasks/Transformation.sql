@@ -5,15 +5,8 @@ MERGE INTO HOUSING_MARKET_PRODUCTION.PUBLIC."Property_Sale_Listings" AS TARGET
 USING (
     SELECT * 
     FROM HOUSING_MARKET_STAGING.PUBLIC.PROPERTY_SALE_LISTINGS
-    WHERE 
-		  (status = 'Active' OR days_on_market < 7)
-		AND 
-			city IN ('Silver Spring', 'Rockville', 'Bethesda', 'Hyattsville', 'Chevy Chase', 
-                   'Takoma Park', 'College Park', 'Riverdale', 'Potomac', 'Brentwood', 
-                   'Kensington', 'Mount Rainier', 'University Park', 'Glenn Dale', 
-                   'Gaithersburg', 'North Bethesda', 'Bowie', 'Garrett Park', 'Cabin John', 'Glen Echo')
-
-) AS SOURCE
+    WHERE status = 'Active' OR days_on_market < 7	
+	) AS SOURCE
 ON TARGET.ID = SOURCE.ID
 
 WHEN MATCHED THEN 
