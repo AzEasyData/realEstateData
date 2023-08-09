@@ -29,7 +29,6 @@ headers = {
 # Define the query parameters
 querystring = {
   "address": "8656 Colesville Rd, Silver Spring, MD 20910",
-  "state": "MD",
   "radius": "20",
   "propertyType": "Single Family, Townhouse",
   "limit": "500",
