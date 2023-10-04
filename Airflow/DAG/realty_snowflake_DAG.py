@@ -3,7 +3,7 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.operators.snowflake_operator import SnowflakeOperator
 from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook
 from airflow.models import Variable
-from datetime import datetime, timedelta
+from time import time, timedelta
 import snowflake.connector
 import requests
 import logging
@@ -58,8 +58,8 @@ def insert_data(cur, records):
    INSERT INTO "PROPERTY_SALE_LISTINGS" (
        "ID", "BATHROOMS", "BEDROOMS", "PRICE", "SQUARE_FOOTAGE", "COUNTY",
        "PROPERTY_TYPE", "ADDRESS_LINE_1", "CITY", "STATE", "ZIP_CODE",
-       "FORMATTED_ADDRESS", "LAST_SEEN", "LISTED_DATE", "STATUS", "REMOVED_DATE",
-       "DAYS_ON_MARKET", "CREATED_DATE", "LOT_SIZE", "YEAR_BUILT", "LATITUDE", "LONGITUDE"
+       "FORMATTED_ADDRESS", "LAST_SEEN", "LISTED_", "STATUS", "REMOVED_",
+       "DAYS_ON_MARKET", "CREATED_", "LOT_SIZE", "YEAR_BUILT", "LATITUDE", "LONGITUDE"
    ) VALUES (
        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
    );
@@ -71,8 +71,8 @@ def insert_data(cur, records):
             record.get('squareFootage'),
             record.get('county'), record.get('propertyType'), record.get('addressLine1'), record.get('city'),
             record.get('state'), record.get('zipCode'), record.get('formattedAddress'), record.get('lastSeen'),
-            record.get('listedDate'), record.get('status'), record.get('removedDate'), record.get('daysOnMarket'),
-            record.get('createdDate'), record.get('lotSize'), record.get('yearBuilt'), record.get('latitude'),
+            record.get('listed'), record.get('status'), record.get('removed'), record.get('daysOnMarket'),
+            record.get('created'), record.get('lotSize'), record.get('yearBuilt'), record.get('latitude'),
             record.get('longitude')
         ) for record in records
     ]
@@ -105,7 +105,7 @@ def extract_load():
 
         # Process data only if it is unique
         unique_records = [record for record in data if record['id'] not in existing_ids]
-        existing_ids.update(record['id'] for record in unique_records)
+        existing_ids.up(record['id'] for record in unique_records)
 
         logging.info(f"Retrieved {len(data)} records, {len(unique_records)} are unique.")
 
@@ -129,7 +129,7 @@ def extract_load():
 ## Airflow Specific Code
 default_args = {
     'owner': 'airflow',
-    'start_date': datetime(2022, 1, 1),
+    'start_date': datetime(2023, 10, 5),
     'retries': 1,
     'retry_delay': timedelta(minutes=5)
 }
@@ -157,7 +157,7 @@ USING (
 ON TARGET.ID = SOURCE.ID
 
 WHEN MATCHED THEN 
-    UPDATE SET 
+    UP SET 
         TARGET.BATHROOMS = SOURCE.BATHROOMS,
         TARGET.BEDROOMS = SOURCE.BEDROOMS,
         TARGET.PRICE = SOURCE.PRICE,
@@ -170,11 +170,11 @@ WHEN MATCHED THEN
         TARGET.ZIP_CODE = SOURCE.ZIP_CODE,
         TARGET.FORMATTED_ADDRESS = SOURCE.FORMATTED_ADDRESS,
         TARGET.LAST_SEEN = SOURCE.LAST_SEEN,
-        TARGET.LISTED_DATE = SOURCE.LISTED_DATE,
+        TARGET.LISTED_ = SOURCE.LISTED_,
         TARGET.STATUS = SOURCE.STATUS,
-        TARGET.REMOVED_DATE = SOURCE.REMOVED_DATE,
+        TARGET.REMOVED_ = SOURCE.REMOVED_,
         TARGET.DAYS_ON_MARKET = SOURCE.DAYS_ON_MARKET,
-        TARGET.CREATED_DATE = SOURCE.CREATED_DATE,
+        TARGET.CREATED_ = SOURCE.CREATED_,
         TARGET.LOT_SIZE = SOURCE.LOT_SIZE,
         TARGET.YEAR_BUILT = SOURCE.YEAR_BUILT,
         TARGET.LATITUDE = SOURCE.LATITUDE,
@@ -184,14 +184,14 @@ WHEN NOT MATCHED THEN
     INSERT (
         "ID", "BATHROOMS", "BEDROOMS", "PRICE", "SQUARE_FOOTAGE", "COUNTY",
         "PROPERTY_TYPE", "ADDRESS_LINE_1", "CITY", "STATE", "ZIP_CODE",
-        "FORMATTED_ADDRESS", "LAST_SEEN", "LISTED_DATE", "STATUS", "REMOVED_DATE",
-        "DAYS_ON_MARKET", "CREATED_DATE", "LOT_SIZE", "YEAR_BUILT", "LATITUDE", "LONGITUDE"
+        "FORMATTED_ADDRESS", "LAST_SEEN", "LISTED_", "STATUS", "REMOVED_",
+        "DAYS_ON_MARKET", "CREATED_", "LOT_SIZE", "YEAR_BUILT", "LATITUDE", "LONGITUDE"
     ) 
     VALUES (
         SOURCE."ID", SOURCE."BATHROOMS", SOURCE."BEDROOMS", SOURCE."PRICE", SOURCE."SQUARE_FOOTAGE", SOURCE."COUNTY",
         SOURCE."PROPERTY_TYPE", SOURCE."ADDRESS_LINE_1", SOURCE."CITY", SOURCE."STATE", SOURCE."ZIP_CODE",
-        SOURCE."FORMATTED_ADDRESS", SOURCE."LAST_SEEN", SOURCE."LISTED_DATE", SOURCE."STATUS", SOURCE."REMOVED_DATE",
-        SOURCE."DAYS_ON_MARKET", SOURCE."CREATED_DATE", SOURCE."LOT_SIZE", SOURCE."YEAR_BUILT", SOURCE."LATITUDE", SOURCE."LONGITUDE"
+        SOURCE."FORMATTED_ADDRESS", SOURCE."LAST_SEEN", SOURCE."LISTED_", SOURCE."STATUS", SOURCE."REMOVED_",
+        SOURCE."DAYS_ON_MARKET", SOURCE."CREATED_", SOURCE."LOT_SIZE", SOURCE."YEAR_BUILT", SOURCE."LATITUDE", SOURCE."LONGITUDE"
     );
 
 """
