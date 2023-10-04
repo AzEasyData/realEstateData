@@ -137,7 +137,7 @@ default_args = {
 dag = DAG('realty_mole_etl',
           default_args=default_args,
           description='ETL pipeline for Realty Mole Property API',
-          schedule_interval='@weekly',
+          schedule_interval='0 17 * * 4',  # Run at 5pm on Thursdays UTC,
           catchup=False)
 
 transform_sql = """
