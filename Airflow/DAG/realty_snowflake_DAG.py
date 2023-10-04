@@ -1,6 +1,8 @@
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
-from airflow.providers.snowflake.operators.snowflake import SnowflakeOperator
+from airflow.operators.snowflake_operator import SnowflakeOperator
+from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook
+from airflow.models import Variable
 from datetime import datetime, timedelta
 import snowflake.connector
 import requests
@@ -11,18 +13,11 @@ import logging
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
-# Set up credentials
-api_key = "b2d2dc0109mshb34de57573fb58ap1f4781jsn24951b2d86a0"
+# Fetch the API endpoint variable 
+api_endpoint = Variable.get("sale_listings_endpoint")
 
-db_credentials = {
-    "user": "Akalunwiwu",
-    "password": "HealthIsWealth0402",
-    "account": "mouuprp-pbb00593",
-    "warehouse": "COMPUTE_WH",
-}
-
-# Define the API endpoint
-api_endpoint = "https://realty-mole-property-api.p.rapidapi.com/saleListings"
+# Fetch the API key variable
+api_key = Variable.get("api_key_property_listings")
 
 # Define the headers
 headers = {
@@ -33,6 +28,7 @@ headers = {
 # Define the query parameters
 querystring = {
   "address": "8656 Colesville Rd, Silver Spring, MD 20910",
+  "state": "MD",
   "radius": "20",
   "propertyType": "Single Family, Townhouse",
   "limit": "500",
@@ -90,56 +86,58 @@ def insert_data(cur, records):
 
 ## Function for DAG
 def extract_load():
-    with snowflake.connector.connect(database='HOUSING_MARKET_STAGING', schema='PUBLIC', **db_credentials) as con:
-        cur = con.cursor()
-        existing_ids = set()
-        request_count = 0  # Initialize API call counter
-        while request_count < 100:  # Limit the number of API calls
-            data = get_data(api_endpoint, headers, querystring)
-            request_count += 1  # Increment the counter with each API call
+    # Use SnowflakeHook to get the connection details
+    hook = SnowflakeHook(snowflake_conn_id='realty_snowflake_staging')
+    conn = hook.get_conn()
+    cur = conn.cursor()
+    existing_ids = set()
+    request_count = 0  # Initialize API call counter
+    while request_count < 100:  # Limit the number of API calls
+        data = get_data(api_endpoint, headers, querystring)
+        request_count += 1  # Increment the counter with each API call
 
-            if data:  # If the data was successfully fetched from the API
-                querystring['offset'] += 500
+        if data:  # If the data was successfully fetched from the API
+            querystring['offset'] += 500
 
-            if not data:  # if there is an error making the API call
-                logging.error(f"No data returned on request {request_count}.")
-                break
+        if not data:  # if there is an error making the API call
+            logging.error(f"No data returned on request {request_count}.")
+            break
 
-            # Process data only if it is unique
-            unique_records = [record for record in data if record['id'] not in existing_ids]
-            existing_ids.update(record['id'] for record in unique_records)
+        # Process data only if it is unique
+        unique_records = [record for record in data if record['id'] not in existing_ids]
+        existing_ids.update(record['id'] for record in unique_records)
 
-            logging.info(f"Retrieved {len(data)} records, {len(unique_records)} are unique.")
+        logging.info(f"Retrieved {len(data)} records, {len(unique_records)} are unique.")
 
-            if unique_records:
-                try:
-                    insert_data(cur, unique_records)
-                    con.commit()  # Commit the transaction
-                    logging.info(
-                        f"Inserted {len(unique_records)} unique records into the database on request {request_count}.")
-                except snowflake.connector.errors.ProgrammingError as e:
-                    logging.error(f"Failed to insert records due to a database error on request {request_count}: {e}")
-                    break  # Exit the loop if insertion fails
-                except Exception as e:
-                    logging.error(f"Failed to insert records due to an unexpected error on request {request_count}: {e}")
-                    break  # Exit the loop if any other insertion error occurs
+        if unique_records:
+            try:
+                insert_data(cur, unique_records)
+                con.commit()  # Commit the transaction
+                logging.info(
+                    f"Inserted {len(unique_records)} unique records into the database on request {request_count}.")
+            except snowflake.connector.errors.ProgrammingError as e:
+                logging.error(f"Failed to insert records due to a database error on request {request_count}: {e}")
+                break  # Exit the loop if insertion fails
+            except Exception as e:
+                logging.error(f"Failed to insert records due to an unexpected error on request {request_count}: {e}")
+                break  # Exit the loop if any other insertion error occurs
 
-            if len(data) < 500:  # if less than 500 records are returned, we've likely reached the end of the data
-                logging.info(f"Less than 500 records returned on request {request_count}.")
-                break
+        if len(data) < 500:  # if less than 500 records are returned, we've likely reached the end of the data
+            logging.info(f"Less than 500 records returned on request {request_count}.")
+            break
 
 ## Airflow Specific Code
 default_args = {
     'owner': 'airflow',
-    'start_date': datetime(2023, 8, 3),
+    'start_date': datetime(2022, 1, 1),
     'retries': 1,
     'retry_delay': timedelta(minutes=5)
 }
 
-dag = DAG('realty_mole_elt',
+dag = DAG('realty_mole_etl',
           default_args=default_args,
-          description='ELT pipeline for Realty Mole Property API',
-          schedule_interval='0 17 * * 4',  # Run at 5pm on Thursdays UTC,
+          description='ETL pipeline for Realty Mole Property API',
+          schedule_interval='@weekly',
           catchup=False)
 
 transform_sql = """
@@ -147,8 +145,15 @@ MERGE INTO HOUSING_MARKET_PRODUCTION.PUBLIC."Property_Sale_Listings" AS TARGET
 USING (
     SELECT * 
     FROM HOUSING_MARKET_STAGING.PUBLIC.PROPERTY_SALE_LISTINGS
-    WHERE status = 'Active' OR days_on_market < 7
-     ) AS SOURCE
+    WHERE 
+		  (status = 'Active' OR days_on_market < 7)
+		AND 
+			city IN ('Silver Spring', 'Rockville', 'Bethesda', 'Hyattsville', 'Chevy Chase', 
+                   'Takoma Park', 'College Park', 'Riverdale', 'Potomac', 'Brentwood', 
+                   'Kensington', 'Mount Rainier', 'University Park', 'Glenn Dale', 
+                   'Gaithersburg', 'North Bethesda', 'Bowie', 'Garrett Park', 'Cabin John', 'Glen Echo')
+
+) AS SOURCE
 ON TARGET.ID = SOURCE.ID
 
 WHEN MATCHED THEN 
@@ -192,12 +197,12 @@ WHEN NOT MATCHED THEN
 """
 
 extract_load_task = PythonOperator(task_id='extract_and_load',
-				   python_callable=extract_load,
-			           dag=dag)
+			           python_callable=extract_load,
+				   dag=dag)
 
 transform_task = SnowflakeOperator(task_id='transform',
                                    sql=transform_sql,
-                                   snowflake_conn_id='snowflake_realty_production',
+                                   snowflake_conn_id='realty_snowflake_production',
                                    dag=dag)
 
 delete_staging_sql = """
@@ -206,7 +211,7 @@ DELETE FROM HOUSING_MARKET_STAGING.PUBLIC.PROPERTY_SALE_LISTINGS;
 
 delete_staging_task = SnowflakeOperator(task_id='delete_staging',
                                         sql=delete_staging_sql,
-                                        snowflake_conn_id='snowflake_realty_staging',
+                                        snowflake_conn_id='realty_snowflake_staging',
                                         dag=dag)
 
 extract_load_task >> transform_task >> delete_staging_task
