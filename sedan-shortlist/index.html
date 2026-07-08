@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sedan Shortlist</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202a;
+      --muted: #657386;
+      --paper: #fbfaf7;
+      --panel: #ffffff;
+      --line: #dfe5ec;
+      --navy: #223a5e;
+      --blue: #2d6cdf;
+      --green: #1f7a5a;
+      --gold: #b7791f;
+      --rose: #c2415d;
+      --sage: #e8f2ec;
+      --sky: #e9f1fb;
+      --sun: #fff2d2;
+      --blush: #fae7eb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(135deg, rgba(45, 108, 223, .09), transparent 34%),
+        linear-gradient(315deg, rgba(31, 122, 90, .10), transparent 38%),
+        var(--paper);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 30px 0 44px;
+    }
+
+    .masthead {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--navy);
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 850px;
+      margin: 10px 0 0;
+      color: #405063;
+      font-size: 16px;
+    }
+
+    .meta {
+      display: grid;
+      gap: 6px;
+      min-width: 190px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .8);
+    }
+
+    .meta strong {
+      color: var(--navy);
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .meta span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(230px, 1.2fr) repeat(4, minmax(150px, 1fr));
+      gap: 10px;
+      margin: 22px 0 18px;
+      padding: 14px;
+      background: rgba(255, 255, 255, .88);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(34, 58, 94, .08);
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    input, select {
+      width: 100%;
+      min-width: 0;
+      height: 40px;
+      padding: 0 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .count {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      display: grid;
+      gap: 13px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-top: 5px solid var(--blue);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .94);
+      box-shadow: 0 12px 34px rgba(34, 58, 94, .09);
+    }
+
+    .card[data-model="Toyota Camry"] { border-top-color: var(--green); }
+    .card[data-model="Subaru Legacy"] { border-top-color: var(--rose); }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .vehicle {
+      min-width: 0;
+    }
+
+    .vehicle h2 {
+      margin: 0;
+      font-size: 19px;
+      line-height: 1.2;
+      color: var(--navy);
+      letter-spacing: 0;
+    }
+
+    .vehicle p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .rank {
+      flex: 0 0 auto;
+      min-width: 42px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: var(--sky);
+      color: var(--navy);
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .stat {
+      min-width: 0;
+      padding: 10px;
+      border-radius: 8px;
+      background: #f7fafc;
+      border: 1px solid #e5ebf1;
+    }
+
+    .stat.price { background: var(--sun); }
+    .stat.miles { background: var(--sage); }
+    .stat.year { background: var(--sky); }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 3px;
+      color: var(--ink);
+      font-size: 18px;
+      line-height: 1.1;
+      word-break: break-word;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 14px;
+    }
+
+    .detail {
+      min-width: 0;
+    }
+
+    .detail span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .detail strong {
+      display: block;
+      margin-top: 2px;
+      overflow-wrap: anywhere;
+      font-weight: 700;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .tag.model { background: var(--sky); color: #234d8d; border-color: #cbdcf5; }
+    .tag.clean { background: var(--sage); color: #176044; border-color: #c6e4d4; }
+    .tag.warn { background: var(--sun); color: #845200; border-color: #eed48a; }
+    .tag.trim { background: var(--blush); color: #9f2944; border-color: #f2c4cd; }
+    .tag.price-type { background: #edf2f7; color: #3d4c60; border-color: #d7e0ea; }
+
+    .notes {
+      margin: 0;
+      color: #4b5c70;
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 2px;
+    }
+
+    a.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 6px;
+      background: var(--navy);
+      color: #fff;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    a.button:hover { background: #152a47; }
+
+    .source {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .footnote {
+      margin: 18px 0 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .78);
+      color: #4b5c70;
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      .masthead { grid-template-columns: 1fr; }
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      main { width: min(100% - 22px, 1180px); padding-top: 18px; }
+      .toolbar { grid-template-columns: 1fr; }
+      .stats, .details { grid-template-columns: 1fr; }
+      .actions { align-items: stretch; flex-direction: column; }
+      a.button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="masthead">
+      <div>
+        <h1>Sedan Shortlist</h1>
+        <p class="subtitle">
+          Honda Accord, Toyota Camry, and Subaru Legacy options near 20905. Filters target 2018-present, under $25k, under 60k miles, gray/silver/black, and reputable dealers at or above roughly 4 stars where rating evidence was available.
+        </p>
+      </div>
+      <div class="meta">
+        <strong id="shownTotal">0</strong>
+        <span>matching cars shown</span>
+      </div>
+    </section>
+
+    <section class="toolbar" aria-label="Vehicle controls">
+      <label>
+        Search
+        <input id="search" type="search" placeholder="Dealer, model, trim, city, color...">
+      </label>
+      <label>
+        Model
+        <select id="modelFilter">
+          <option value="all">All models</option>
+          <option value="Honda Accord">Honda Accord</option>
+          <option value="Toyota Camry">Toyota Camry</option>
+          <option value="Subaru Legacy">Subaru Legacy</option>
+        </select>
+      </label>
+      <label>
+        Sort
+        <select id="sort">
+          <option value="rank">Recommended</option>
+          <option value="price">Price, low to high</option>
+          <option value="mileage">Mileage, low to high</option>
+          <option value="year">Year, newest first</option>
+        </select>
+      </label>
+      <label>
+        Price type
+        <select id="priceTypeFilter">
+          <option value="all">All</option>
+          <option value="likely-negotiable">Likely negotiable</option>
+          <option value="unknown">Unknown</option>
+          <option value="non-negotiable">Non-negotiable</option>
+        </select>
+      </label>
+      <label>
+        Trim fit
+        <select id="trimFitFilter">
+          <option value="all">All</option>
+          <option value="preferred">SE/Sport/EX/Limited+</option>
+          <option value="value">Value trims</option>
+        </select>
+      </label>
+    </section>
+
+    <p class="count" id="count"></p>
+    <section class="grid" id="cards"></section>
+
+    <p class="footnote">
+      Price negotiability is inferred. Traditional dealer listings are marked likely negotiable; no-haggle retailers would be marked non-negotiable. “Rating evidence” names Google when I could verify a Google rating from the search results; otherwise the source is labeled as a reputable major-platform rating and should be rechecked before visiting.
+    </p>
+  </main>
+
+  <script>
+    const cars = [
+      { rank: 1, model: "Honda Accord", year: 2023, vehicle: "2023 Honda Accord", trim: "EX FWD", trimFit: "preferred", price: 23949, mileage: 59399, color: "Gray", dealer: "Sport Honda", rating: "Google 4.5", location: "Silver Spring, MD", accidents: 0, fuel: "Gasoline", priceType: "likely-negotiable", notes: "Closest option. EX trim is a strong match for the Camry SE-or-better preference.", url: "https://www.cargurus.com/details/452448257" },
+      { rank: 2, model: "Toyota Camry", year: 2020, vehicle: "2020 Toyota Camry", trim: "SE FWD", trimFit: "preferred", price: 20683, mileage: 46824, color: "Black", dealer: "Hampstead Preowned Auto Sales", rating: "Google/online avg 4.8", location: "Hampstead, MD", accidents: 1, fuel: "Gasoline", priceType: "likely-negotiable", notes: "Strong price and the right SE trim, but the accident report makes it worth extra inspection.", url: "https://www.cargurus.com/details/447286925" },
+      { rank: 3, model: "Honda Accord", year: 2023, vehicle: "2023 Honda Accord", trim: "EX FWD, HondaTrue Certified+", trimFit: "preferred", price: 23800, mileage: 49464, color: "Meteorite / gray", dealer: "Jim Coleman Honda", rating: "Google ~4.5+", location: "Clarksville, MD", accidents: 0, fuel: "Gasoline", priceType: "likely-negotiable", notes: "CPO, EX trim, and clean accident history. One of the best feature/value fits.", url: "https://www.cargurus.com/details/448450272" },
+      { rank: 4, model: "Subaru Legacy", year: 2024, vehicle: "2024 Subaru Legacy", trim: "AWD, manufacturer CPO", trimFit: "value", price: 22498, mileage: 29603, color: "Gray Metallic", dealer: "Safford Subaru Manassas", rating: "Google 4.5", location: "Manassas, VA", accidents: 0, fuel: "Gasoline", priceType: "likely-negotiable", notes: "AWD, CPO, newer year, low mileage. Best Legacy fit found under the same constraints.", url: "https://www.cargurus.com/details/450900898" },
+      { rank: 5, model: "Toyota Camry", year: 2023, vehicle: "2023 Toyota Camry", trim: "LE FWD", trimFit: "value", price: 23995, mileage: 22715, color: "Gray", dealer: "Car Loft", rating: "KBB/Google blend 4.3", location: "Fredericksburg, VA", accidents: 0, fuel: "Gasoline", priceType: "likely-negotiable", notes: "Very low mileage and clean history; LE trim is below the preferred SE target.", url: "https://www.cargurus.com/details/448631741" },
+      { rank: 6, model: "Honda Accord", year: 2019, vehicle: "2019 Honda Accord", trim: "1.5T Sport FWD", trimFit: "preferred", price: 20990, mileage: 45192, color: "Black", dealer: "Auto Fanatics", rating: "Google 4.9", location: "Fredericksburg, VA", accidents: 0, fuel: "Gasoline", priceType: "likely-negotiable", notes: "Best price among preferred Accord trims; farther away but within the target drive window.", url: "https://www.cargurus.com/details/450793568" },
+      { rank: 7, model: "Toyota Camry", year: 2024, vehicle: "2024 Toyota Camry", trim: "LE FWD", trimFit: "value", price: 24200, mileage: 55504, color: "Celestial Silver Metallic", dealer: "Annapolis Nissan", rating: "Major-platform 4.7", location: "Annapolis, MD", accidents: 0, fuel: "Gasoline", priceType: "likely-negotiable", notes: "Newer Camry in a target color with clean history; LE trim keeps it in the value tier.", url: "https://www.cargurus.com/details/449963732" },
+      { rank: 8, model: "Honda Accord", year: 2021, vehicle: "2021 Honda Accord", trim: "LX FWD", trimFit: "value", price: 20800, mileage: 59784, color: "Lunar Silver Metallic", dealer: "Cherner Brothers Auto Brokers", rating: "Google 4.7", location: "Kensington, MD", accidents: 0, fuel: "Gasoline", priceType: "likely-negotiable", notes: "Good local value and clean report, but LX is below the preferred Sport/EX target.", url: "https://www.cargurus.com/details/450942145" },
+      { rank: 9, model: "Subaru Legacy", year: 2022, vehicle: "2022 Subaru Legacy", trim: "Limited XT AWD, manufacturer CPO", trimFit: "preferred", price: 23796, mileage: 49603, color: "Ice Silver Metallic", dealer: "Jones Bel Air Subaru", rating: "Major-platform 4.8", location: "Fallston, MD", accidents: 0, fuel: "Gasoline", priceType: "likely-negotiable", notes: "Limited XT is the strongest feature/performance Legacy in the list; rating source should be rechecked on Google.", url: "https://www.cargurus.com/details/448369400" },
+      { rank: 10, model: "Honda Accord", year: 2020, vehicle: "2020 Honda Accord", trim: "1.5T LX FWD", trimFit: "value", price: 21800, mileage: 35443, color: "Crystal Black Pearl", dealer: "Ourisman Toyota 40", rating: "Google 4.6", location: "Edgewood, MD", accidents: 0, fuel: "Gasoline", priceType: "likely-negotiable", notes: "Low mileage and clean history; trim is the main compromise.", url: "https://www.cargurus.com/details/452220555" },
+      { rank: 11, model: "Subaru Legacy", year: 2025, vehicle: "2025 Subaru Legacy", trim: "Premium AWD", trimFit: "value", price: 24681, mileage: 22039, color: "Crystal Black Silica", dealer: "Heritage Subaru Catonsville", rating: "Major-platform 4.6", location: "Catonsville, MD", accidents: 0, fuel: "Gasoline", priceType: "likely-negotiable", notes: "Newest Legacy and very low mileage. Confirm Google rating directly before visiting.", url: "https://www.cargurus.com/details/444859807" },
+      { rank: 12, model: "Honda Accord", year: 2023, vehicle: "2023 Honda Accord", trim: "LX FWD", trimFit: "value", price: 23283, mileage: 35514, color: "Gray", dealer: "Hampstead Preowned Auto Sales", rating: "Google/online avg 4.8", location: "Hampstead, MD", accidents: 0, fuel: "Gasoline", priceType: "likely-negotiable", notes: "Newer model year and low mileage; LX trim.", url: "https://www.cargurus.com/details/451026088" },
+      { rank: 13, model: "Honda Accord", year: 2023, vehicle: "2023 Honda Accord", trim: "LX FWD", trimFit: "value", price: 24083, mileage: 46154, color: "Gray", dealer: "Ourisman Honda of Frederick", rating: "Google 4.6", location: "Frederick, MD", accidents: 0, fuel: "Gasoline", priceType: "likely-negotiable", notes: "Reputable Honda dealer, clean history; trim is below the preferred target.", url: "https://www.cargurus.com/details/451974372" },
+      { rank: 14, model: "Honda Accord", year: 2025, vehicle: "2025 Honda Accord", trim: "LX FWD, HondaTrue Certified+", trimFit: "value", price: 24795, mileage: 18856, color: "Crystal Black Pearl", dealer: "Ourisman Honda Bethesda", rating: "Google 4.3", location: "Bethesda, MD", accidents: 0, fuel: "Gasoline", priceType: "likely-negotiable", notes: "Newest Accord and lowest Accord mileage; LX trim but CPO and very close.", url: "https://www.cargurus.com/details/447892024" },
+      { rank: 15, model: "Honda Accord", year: 2018, vehicle: "2018 Honda Accord", trim: "1.5T Sport FWD", trimFit: "preferred", price: 22300, mileage: 49538, color: "Lunar Silver Metallic", dealer: "Heritage Toyota Catonsville", rating: "4+ on major platforms", location: "Baltimore, MD", accidents: 1, fuel: "Gasoline", priceType: "likely-negotiable", notes: "Sport trim and desired color, but one reported accident makes it a lower-priority option.", url: "https://www.cargurus.com/details/452271473" },
+      { rank: 16, model: "Toyota Camry", year: 2022, vehicle: "2022 Toyota Camry", trim: "SE FWD", trimFit: "preferred", price: 24998, mileage: 55000, color: "Gray", dealer: "CarMax Newark", rating: "CarMax no-haggle retailer, Google 4+", location: "Newark, DE / ships to 20905", accidents: null, accidentReport: "AutoCheck available", fuel: "Gasoline", priceType: "non-negotiable", source: "CarMax", notes: "SE trim, gray/black color combo, and fixed no-haggle price. $149 shipping shown from Newark.", url: "https://www.carmax.com/car/70082123" },
+      { rank: 17, model: "Toyota Camry", year: 2023, vehicle: "2023 Toyota Camry", trim: "LE FWD", trimFit: "value", price: 24998, mileage: 43000, color: "Gray", dealer: "CarMax Laurel", rating: "CarMax no-haggle retailer, Google 4+", location: "Laurel, MD", accidents: null, accidentReport: "AutoCheck available", fuel: "Gasoline", priceType: "non-negotiable", source: "CarMax", notes: "Nearby CarMax option with lower mileage; LE trim is the compromise versus SE.", url: "https://www.carmax.com/car/28231411" },
+      { rank: 18, model: "Honda Accord", year: 2023, vehicle: "2023 Honda Accord", trim: "EX FWD", trimFit: "preferred", price: 24998, mileage: 53000, color: "Gray", dealer: "CarMax Dulles", rating: "CarMax no-haggle retailer, Google 4+", location: "Dulles, VA", accidents: null, accidentReport: "AutoCheck available; single-owner", fuel: "Gasoline", priceType: "non-negotiable", source: "CarMax", notes: "Preferred EX trim in a target color. The listing showed single-owner history from AutoCheck.", url: "https://www.carmax.com/car/28896027" },
+      { rank: 19, model: "Subaru Legacy", year: 2020, vehicle: "2020 Subaru Legacy", trim: "Premium AWD", trimFit: "value", price: 22998, mileage: 19000, color: "Silver", dealer: "CarMax Lancaster", rating: "CarMax no-haggle retailer, Google 4+", location: "Lancaster, PA / ships to 20905", accidents: null, accidentReport: "AutoCheck available", fuel: "Gasoline", priceType: "non-negotiable", source: "CarMax", notes: "Very low mileage, AWD, silver/gray color combo, and still under budget after fixed pricing.", url: "https://www.carmax.com/car/70046246" },
+      { rank: 20, model: "Subaru Legacy", year: 2020, vehicle: "2020 Subaru Legacy", trim: "Premium AWD", trimFit: "value", price: 19998, mileage: 55000, color: "Silver", dealer: "CarMax Lancaster", rating: "CarMax no-haggle retailer, Google 4+", location: "Lancaster, PA / ships to 20905", accidents: null, accidentReport: "AutoCheck available", fuel: "Gasoline", priceType: "non-negotiable", source: "CarMax", notes: "Lowest-priced CarMax Legacy found that still fits year, mileage, and color criteria.", url: "https://www.carmax.com/car/70098489" },
+      { rank: 21, model: "Honda Accord", year: 2018, vehicle: "2018 Honda Accord", trim: "Sport Sedan 4D", trimFit: "preferred", price: 23990, mileage: 41352, color: "Modern Steel Metallic", dealer: "Carvana", rating: "Carvana online avg 4.2+", location: "Online delivery to 20905", accidents: 0, accidentReport: "No reported accidents", fuel: "Gasoline", priceType: "non-negotiable", source: "Carvana", notes: "Sport trim, no-haggle price, free shipping shown, and a clean Carvana accident summary.", url: "https://www.carvana.com/vehicle/4525571" },
+      { rank: 22, model: "Honda Accord", year: 2018, vehicle: "2018 Honda Accord", trim: "Touring Sedan 4D", trimFit: "preferred", price: 24590, mileage: 50555, color: "Gray", dealer: "Carvana", rating: "Carvana online avg 4.2+", location: "Online delivery to 20905", accidents: 0, accidentReport: "No reported accidents", fuel: "Gasoline", priceType: "non-negotiable", source: "Carvana", notes: "Top Touring trim with free shipping shown. Strong feature fit if you are comfortable buying online.", url: "https://www.carvana.com/vehicle/4492180" },
+      { rank: 23, model: "Toyota Camry", year: 2018, vehicle: "2018 Toyota Camry", trim: "SE Sedan 4D", trimFit: "preferred", price: 23990, mileage: 36922, color: "Predawn Gray Mica", dealer: "Carvana", rating: "Carvana online avg 4.2+", location: "Online delivery to 20905", accidents: null, accidentReport: "History summary available", fuel: "Gasoline", priceType: "non-negotiable", source: "Carvana", notes: "Camry SE, target gray color, and low mileage. Shipping was listed at $690.", url: "https://www.carvana.com/vehicle/4489789" },
+      { rank: 24, model: "Honda Accord", year: 2019, vehicle: "2019 Honda Accord Hybrid", trim: "Hybrid Sedan 4D", trimFit: "value", price: 23990, mileage: 57675, color: "Lunar Silver Metallic", dealer: "Carvana", rating: "Carvana online avg 4.2+", location: "Online delivery to 20905", accidents: null, accidentReport: "History summary available", fuel: "Hybrid", priceType: "non-negotiable", source: "Carvana", notes: "Hybrid fuel economy and a target silver color; mileage is close to the 60k ceiling.", url: "https://www.carvana.com/vehicle/4533987" },
+      { rank: 25, model: "Subaru Legacy", year: 2021, vehicle: "2021 Subaru Legacy", trim: "Limited AWD", trimFit: "preferred", price: 23590, mileage: 42213, color: "Ice Silver Metallic", dealer: "Carvana", rating: "Carvana online avg 4.2+", location: "Online delivery to 20905", accidents: 0, accidentReport: "No reported accidents", fuel: "Gasoline", priceType: "non-negotiable", source: "Carvana", notes: "Limited trim is well above the value-trim baseline, with AWD and a clean accident summary.", url: "https://www.carvana.com/vehicle/4463590" },
+      { rank: 26, model: "Subaru Legacy", year: 2022, vehicle: "2022 Subaru Legacy", trim: "Limited AWD", trimFit: "preferred", price: 24990, mileage: 33389, color: "Ice Silver Metallic", dealer: "Carvana", rating: "Carvana online avg 4.2+", location: "Online delivery to 20905", accidents: 0, accidentReport: "No reported accidents", fuel: "Gasoline", priceType: "non-negotiable", source: "Carvana", notes: "Low-mileage Limited trim with the right color; shipping was listed at $1,590.", url: "https://www.carvana.com/vehicle/4525494" },
+      { rank: 27, model: "Subaru Legacy", year: 2022, vehicle: "2022 Subaru Legacy", trim: "Premium AWD", trimFit: "value", price: 22590, mileage: 40326, color: "Magnetite Gray Metallic", dealer: "Carvana", rating: "Carvana online avg 4.2+", location: "Online delivery to 20905", accidents: 0, accidentReport: "No reported accidents", fuel: "Gasoline", priceType: "non-negotiable", source: "Carvana", notes: "Good balance of year, mileage, price, AWD, and target gray color.", url: "https://www.carvana.com/vehicle/4362953" },
+      { rank: 28, model: "Subaru Legacy", year: 2023, vehicle: "2023 Subaru Legacy", trim: "Limited AWD", trimFit: "preferred", price: 24990, mileage: 45378, color: "Magnetite Gray Metallic", dealer: "Carvana", rating: "Carvana online avg 4.2+", location: "Online delivery to 20905", accidents: 0, accidentReport: "No reported accidents", fuel: "Gasoline", priceType: "non-negotiable", source: "Carvana", notes: "Newer Limited trim in gray; high-feature Legacy option right at the budget ceiling.", url: "https://www.carvana.com/vehicle/4490383" },
+      { rank: 29, model: "Subaru Legacy", year: 2024, vehicle: "2024 Subaru Legacy", trim: "Premium AWD", trimFit: "value", price: 24990, mileage: 29616, color: "Crystal Black Silica", dealer: "Carvana", rating: "Carvana online avg 4.2+", location: "Online delivery to 20905", accidents: null, accidentReport: "History summary available", fuel: "Gasoline", priceType: "non-negotiable", source: "Carvana", notes: "Newest Carvana Legacy that fit price, mileage, and black exterior criteria.", url: "https://www.carvana.com/vehicle/4522254" },
+      { rank: 30, model: "Subaru Legacy", year: 2018, vehicle: "2018 Subaru Legacy", trim: "3.6R Limited AWD", trimFit: "preferred", price: 22990, mileage: 49599, color: "Magnetite Gray Metallic", dealer: "Carvana", rating: "Carvana online avg 4.2+", location: "Online delivery to 20905", accidents: 0, accidentReport: "No reported accidents", fuel: "Gasoline", priceType: "non-negotiable", source: "Carvana", notes: "Top 3.6R Limited trim with target gray color and clean accident summary.", url: "https://www.carvana.com/vehicle/4417029" }
+    ];
+
+    const cards = document.getElementById("cards");
+    const count = document.getElementById("count");
+    const shownTotal = document.getElementById("shownTotal");
+    const search = document.getElementById("search");
+    const modelFilter = document.getElementById("modelFilter");
+    const sort = document.getElementById("sort");
+    const priceTypeFilter = document.getElementById("priceTypeFilter");
+    const trimFitFilter = document.getElementById("trimFitFilter");
+
+    const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+    const number = new Intl.NumberFormat("en-US");
+
+    function priceTypeLabel(value) {
+      if (value === "non-negotiable") return "Non-negotiable";
+      if (value === "unknown") return "Unknown";
+      return "Likely negotiable";
+    }
+
+    function trimFitLabel(value) {
+      return value === "preferred" ? "Preferred trim" : "Value trim";
+    }
+
+    function accidentLabel(car) {
+      if (car.accidentReport) return car.accidentReport;
+      if (car.accidents === 0) return "0 reported";
+      if (car.accidents == null) return "History available";
+      return `${car.accidents} reported`;
+    }
+
+    function accidentTag(car) {
+      if (car.accidents === 0 || /no reported/i.test(car.accidentReport || "")) {
+        return { className: "clean", text: "Clean accident report" };
+      }
+      if (typeof car.accidents === "number" && car.accidents > 0) {
+        return { className: "warn", text: `${car.accidents} accident reported` };
+      }
+      return { className: "warn", text: accidentLabel(car) };
+    }
+
+    function filterAndSort() {
+      const query = search.value.trim().toLowerCase();
+      let visible = cars.filter(car => {
+        const haystack = [
+          car.model, car.vehicle, car.trim, car.color, car.dealer,
+          car.rating, car.location, car.fuel, car.notes
+        ].join(" ").toLowerCase();
+        return (!query || haystack.includes(query))
+          && (modelFilter.value === "all" || car.model === modelFilter.value)
+          && (priceTypeFilter.value === "all" || car.priceType === priceTypeFilter.value)
+          && (trimFitFilter.value === "all" || car.trimFit === trimFitFilter.value);
+      });
+
+      visible.sort((a, b) => {
+        if (sort.value === "price") return a.price - b.price;
+        if (sort.value === "mileage") return a.mileage - b.mileage;
+        if (sort.value === "year") return b.year - a.year || a.price - b.price;
+        return a.rank - b.rank;
+      });
+
+      render(visible);
+    }
+
+    function render(list) {
+      cards.innerHTML = "";
+      shownTotal.textContent = list.length;
+      count.textContent = `${list.length} vehicle${list.length === 1 ? "" : "s"} shown`;
+
+      for (const car of list) {
+        const history = accidentTag(car);
+        const card = document.createElement("article");
+        card.className = "card";
+        card.dataset.model = car.model;
+        card.innerHTML = `
+          <div class="card-head">
+            <div class="vehicle">
+              <h2>${car.vehicle}</h2>
+              <p>${car.trim}</p>
+            </div>
+            <div class="rank">#${car.rank}</div>
+          </div>
+
+          <div class="stats">
+            <div class="stat price"><span>Price</span><strong>${money.format(car.price)}</strong></div>
+            <div class="stat miles"><span>Mileage</span><strong>${number.format(car.mileage)}</strong></div>
+            <div class="stat year"><span>Year</span><strong>${car.year}</strong></div>
+          </div>
+
+          <div class="details">
+            <div class="detail"><span>Dealer</span><strong>${car.dealer}</strong></div>
+            <div class="detail"><span>Rating</span><strong>${car.rating}</strong></div>
+            <div class="detail"><span>Location</span><strong>${car.location}</strong></div>
+            <div class="detail"><span>Color</span><strong>${car.color}</strong></div>
+            <div class="detail"><span>Fuel</span><strong>${car.fuel}</strong></div>
+            <div class="detail"><span>Accidents</span><strong>${accidentLabel(car)}</strong></div>
+          </div>
+
+          <div class="tags">
+            <span class="tag model">${car.model}</span>
+            <span class="tag ${history.className}">${history.text}</span>
+            <span class="tag trim">${trimFitLabel(car.trimFit)}</span>
+            <span class="tag price-type">${priceTypeLabel(car.priceType)}</span>
+          </div>
+
+          <p class="notes">${car.notes}</p>
+
+          <div class="actions">
+            <a class="button" href="${car.url}" target="_blank" rel="noopener noreferrer">Open listing</a>
+            <span class="source">Source: ${car.source || "CarGurus listing"}</span>
+          </div>
+        `;
+        cards.appendChild(card);
+      }
+    }
+
+    [search, modelFilter, sort, priceTypeFilter, trimFitFilter].forEach(control => {
+      control.addEventListener("input", filterAndSort);
+      control.addEventListener("change", filterAndSort);
+    });
+
+    filterAndSort();
+  </script>
+</body>
+</html>
